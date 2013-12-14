@@ -22,6 +22,8 @@ io.sockets.on('connection', function (socket) {
 	socket.on('clientMessage', function(content) {
 		socket.emit('serverMessage', 'You said : ' + content);
 
+
+
 		socket.get('username', function (err, username) {
 			if(!username) {
 				username = socket.id;
@@ -35,6 +37,14 @@ io.sockets.on('connection', function (socket) {
 					broadcast.to(room);
 				}
 				broadcast.emit('serverMessage', username + ' said : ' + content);
+				broadcast.emit('serverInfo', 'Total Rooms : '+ io.sockets.clients().length);
+				
+				var handshaken = io.sockets.handshaken;
+				var connected = io.sockets.connected;
+				var open = io.sockets.open;
+				var closed = io.sockets.closed;
+
+				console.log(handshaken)
 			})
 
 			

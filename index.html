@@ -4,7 +4,7 @@
 		<style type="text/css">
 		#input{width: 200px;}
 		#messages{
-			position: fixed;
+			height: 500px;
 			top: 40px;
 			bottom: 8px;
 			left: 8px;
@@ -15,6 +15,7 @@
 		</style>
 	</head>
 	<body>
+		<div id="info"></div>
 		Your message:
 		<input type="text" id="input" >
 
@@ -23,6 +24,7 @@
 		<script src="http://192.168.1.117:4000/socket.io/socket.io.js" ></script>
 		<script type="text/javascript">
 			var messagesElement = document.getElementById('messages');
+			var infoElement = document.getElementById('info');
 			var lastMessageElement = null;
 
 			function addMessage(message) {
@@ -38,6 +40,12 @@
 			var socket = io.connect('http://192.168.1.117:4000');
 			socket.on('serverMessage', function(content) {
 				addMessage(content);
+			});
+
+			socket.on('serverInfo', function(message) {
+				
+				infoElement.innerHTML = message;
+				
 			});
 
 			socket.on('entry', function(username) {
