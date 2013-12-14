@@ -18,7 +18,8 @@ function handler(req, res) {
 	);
 }
 
-io.sockets.on('connection', function (socket) {
+var chat = io.of('/chat')
+chat.on('connection', function (socket) {
 	socket.on('clientMessage', function(content) {
 		socket.emit('serverMessage', 'You said : ' + content);
 
@@ -44,7 +45,7 @@ io.sockets.on('connection', function (socket) {
 				var open = io.sockets.open;
 				var closed = io.sockets.closed;
 
-				console.log(handshaken)
+				console.log(open);
 			})
 
 			
