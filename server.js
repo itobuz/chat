@@ -30,12 +30,10 @@ chat.on('connection', function (socket) {
 				var broadcast = socket.broadcast;
 				var message = content;
 				if(room) {
-					broadcast.to(room);
-				} else {
-					socket.join(newroom);
+					broadcast = broadcast.to(room);
 				}
 				broadcast.emit('serverMessage', username + ' said : ' + content);
-				broadcast.emit('serverInfo', 'Total Rooms : '+ newroom.data.roomName);
+				
 				
 				var handshaken = io.sockets.handshaken;
 				var connected = io.sockets.connected;
@@ -53,7 +51,9 @@ chat.on('connection', function (socket) {
 		socket.set('username', username, function(err) {
 			if(err) { throw err; }
 
-
+			socket.join(newroom);
+			room = newroom.data.roomName;
+			socket.broadcast.emit('serverInfo', 'Total Rooms : '+ room);
 
 			socket.emit('serverMessage', 'Currently loggedin as : ' + username);
 			socket.broadcast.emit('serverMessage', 'User ' + username + ' logged in');
@@ -77,7 +77,7 @@ chat.on('connection', function (socket) {
 			socket.set('room', room, function (err) {
 				if(err) { throw err; }
 
-				var newerroom = new Room({roomNum:roomCount, roomName: socket.id, isPublic: 0, userCount: 0}); //get room name from the user input later on
+				var newerroom = new Room({roomNum:roomCount, roomName: room, isPublic: 0, userCount: 0}); //get room name from the user input later on
 				
 
 				socket.join(newerroom);
