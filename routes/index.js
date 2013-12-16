@@ -1,8 +1,17 @@
+module.exports = function() {
 
-/*
- * GET home page.
- */
+	var functions = {};
 
-exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
+	functions.chat = function(req, res) {
+		res.render('index', { 
+  			title: 'Express', 
+  			scripts:['javascripts/script.js']
+ 		});
+
+	}
+	
+	return functions;
 };
+
+
+  	

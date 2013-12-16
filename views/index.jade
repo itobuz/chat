@@ -1,5 +1,18 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+	h1= title
+	p Welcome to #{title}
+
+	div(id="info")
+	
+	p Your message:
+
+	input(type="text" id="input")
+
+	div(id = "messages")
+
+
+	script(type='text/javascript', src= 'http://192.168.1.117:3000/socket.io/socket.io.js')
+	each script in scripts
+		script(type='text/javascript', src= script)

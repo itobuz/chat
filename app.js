@@ -5,7 +5,8 @@
 
 module.exports = function() {
 	var express = require('express');
-	var routes = require('./routes');
+
+	var routes = require('./routes')();
 	var user = require('./routes/user');
 	
 	var path = require('path');
@@ -29,7 +30,7 @@ module.exports = function() {
 	  app.use(express.errorHandler());
 	}
 
-	app.get('/', routes.index);
+	app.get('/chat', routes.chat);
 	app.get('/users', user.list);
 
 
