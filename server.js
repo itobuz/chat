@@ -8,6 +8,9 @@ server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+var Room = require('./models/rooms');
+var newroom = new Room({roomNum:0, roomName: 'Common', isPublic: 1, userCount: 0});
+var roomCount = 1;
 
 var chat = io.of('/chat');
 
@@ -28,16 +31,18 @@ chat.on('connection', function (socket) {
 				var message = content;
 				if(room) {
 					broadcast.to(room);
+				} else {
+					socket.join(newroom);
 				}
 				broadcast.emit('serverMessage', username + ' said : ' + content);
-				broadcast.emit('serverInfo', 'Total Rooms : '+ io.sockets.clients().length);
+				broadcast.emit('serverInfo', 'Total Rooms : '+ newroom.data.roomName);
 				
 				var handshaken = io.sockets.handshaken;
 				var connected = io.sockets.connected;
 				var open = io.sockets.open;
 				var closed = io.sockets.closed;
 
-				console.log(open);
+				console.log(io.sockets.clients().length);
 			})
 
 			
@@ -48,8 +53,8 @@ chat.on('connection', function (socket) {
 		socket.set('username', username, function(err) {
 			if(err) { throw err; }
 
-			
-			
+
+
 			socket.emit('serverMessage', 'Currently loggedin as : ' + username);
 			socket.broadcast.emit('serverMessage', 'User ' + username + ' logged in');
 		});
@@ -71,7 +76,13 @@ chat.on('connection', function (socket) {
 
 			socket.set('room', room, function (err) {
 				if(err) { throw err; }
-				socket.join(room);
+
+				var newerroom = new Room({roomNum:roomCount, roomName: socket.id, isPublic: 0, userCount: 0}); //get room name from the user input later on
+				
+
+				socket.join(newerroom);
+				roomCount++;
+
 				if(oldRoom){
 					socket.leave(oldRoom);
 				}
@@ -87,6 +98,7 @@ chat.on('connection', function (socket) {
 						username = socket.id;
 					}
 					socket.broadcast.to(room).emit('serverMessage', 'User '+ username + ' joined this room ' + room);
+					socket.emit('serverInfo', 'Total Rooms : '+ newerroom.data.roomName);
 				});
 			});
 
