@@ -5,6 +5,7 @@ var Rooms = function(info) {
 		roomOwner: null,
 		userCount: null,
 		isPublic: null,
+		users : []
 	};
 	this.fill = function(info) {
 		for(var prop in this.data) {

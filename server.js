@@ -4,12 +4,14 @@ var http = require('http'),
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
+io.set('log level', 1); // reduce logging
+
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
 var Room = require('./models/rooms');
-var newroom = new Room({roomNum:0, roomName: 'Common', isPublic: 1, userCount: 0});
+var newroom = new Room({roomNum:0, roomName: 'Common', isPublic: 1, userCount: 0, users:[]});
 var roomCount = 1;
 
 var chat = io.of('/chat');
@@ -41,7 +43,7 @@ chat.on('connection', function (socket) {
 				var closed = io.sockets.closed;
 
 				console.log(io.sockets.clients().length);
-			})
+			});
 
 			
 		});
@@ -53,6 +55,13 @@ chat.on('connection', function (socket) {
 
 			socket.join(newroom);
 			room = newroom.data.roomName;
+
+			socket.set('room', [newroom]);
+			console.log("Get Rooms: " + socket.get('room'));
+
+			newroom.data.users.push(socket.id);
+			console.log(newroom.data);
+
 			socket.broadcast.emit('serverInfo', 'Total Rooms : '+ room);
 
 			socket.emit('serverMessage', 'Currently loggedin as : ' + username);
@@ -65,6 +74,14 @@ chat.on('connection', function (socket) {
 			if(!username) {
 				username = socket.id;
 			}
+			
+			/*var index = array.indexOf(5);
+			
+
+			if (index > -1) {
+			    array.splice(index, 1);
+			}
+			*/
 			socket.broadcast.emit('serverMessage', 'User ' + username + ' disconnected');
 		});
 	});
@@ -77,8 +94,9 @@ chat.on('connection', function (socket) {
 			socket.set('room', room, function (err) {
 				if(err) { throw err; }
 
-				var newerroom = new Room({roomNum:roomCount, roomName: room, isPublic: 0, userCount: 0}); //get room name from the user input later on
-				
+				var newerroom = new Room({roomNum:roomCount, roomName: room, isPublic: 0, userCount: 0, users:[]}); //get room name from the user input later on
+				newerroom.data.users.push(socket.id);
+				console.log(newerroom.data);
 
 				socket.join(newerroom);
 				roomCount++;
@@ -112,4 +130,4 @@ chat.on('connection', function (socket) {
 var prompt = repl.start({prompt: 'rooms> '});
 
 var rooms = require('./models/rooms');
-prompt.context.rooms = rooms;
+prompt.context.rooms = chat;

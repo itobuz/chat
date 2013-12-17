@@ -5,7 +5,7 @@ module.exports = function() {
 	functions.chat = function(req, res) {
 		res.render('index', { 
   			title: 'Express', 
-  			scripts:['javascripts/script.js']
+  			scripts:['../javascripts/script.js']
  		});
 
 	}
