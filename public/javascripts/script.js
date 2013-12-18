@@ -61,7 +61,13 @@
 				}
 			}
 
-		
+			socket.on('roomList', function(roomName) {
+				var li = '<li><a href="#'+ roomName +'" >'+ roomName +'</a></li>';
+				$("#roomList").append(li);
+			});
+
+
+
 			$('#myTab a').click(function (e) {
 				e.preventDefault()
 				$(this).tab('show')

@@ -75,7 +75,7 @@ chat.on('connection', function (socket) {
 	});
 
 	socket.on('disconnect', function() {
-		delete chatClients[socket.id];
+		//delete chatClients[socket.id];
 		socket.get('username', function(err, username) {
 			if(!username) {
 				username = socket.id;
@@ -126,7 +126,7 @@ chat.on('connection', function (socket) {
 					socket.emit('serverInfo', 'Total Rooms : '+ newerroom.data.roomName);
 				});
 
-			
+				chat.emit('roomList', newerroom.data.roomName);
 			/*});
 
 		});*/
