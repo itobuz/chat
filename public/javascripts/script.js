@@ -61,3 +61,17 @@
 				}
 			}
 
+		
+			$('#myTab a').click(function (e) {
+				e.preventDefault()
+				$(this).tab('show')
+			});
+			$('#createRoom').click(function (e) {
+					e.preventDefault();
+					var roomName = prompt('What room name would you like to use?');
+					var li = '<li><a href="#'+ roomName +'" data-toggle="tab">'+ roomName +'</a></li>';
+					$("#rooms").append(li);
+					li = '<div class="tab-pane well messageBox" id="'+ roomName +'">...</div>';
+					$("#roomContent").append(li);
+			});
+		

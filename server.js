@@ -11,8 +11,10 @@ server.listen(app.get('port'), function(){
 });
 
 var Room = require('./models/rooms');
-var newroom = new Room({roomNum:0, roomName: 'Common', isPublic: 1, userCount: 0, users:[]});
+var newroom = new Room({roomNum:0, roomName: 'Lobby', isPublic: 1, userCount: 0, users:[]});
 var roomCount = 1;
+
+var clients = {};
 
 var chat = io.of('/chat');
 
@@ -56,10 +58,13 @@ chat.on('connection', function (socket) {
 			socket.join(newroom);
 			room = newroom.data.roomName;
 
-			socket.set('room', [newroom]);
-			console.log("Get Rooms: " + socket.get('room'));
+			//socket.set('room', [newroom]);
 
-			newroom.data.users.push(socket.id);
+			//console.log("Get Rooms: " + socket.get('room'));
+
+			newroom.data.users.push({id: socket.id, username: username});
+			clients[socket.id] = newroom;
+
 			console.log(newroom.data);
 
 			socket.broadcast.emit('serverInfo', 'Total Rooms : '+ room);
@@ -69,7 +74,8 @@ chat.on('connection', function (socket) {
 		});
 	});
 
-	socket.on('disconnect', function () {
+	socket.on('disconnect', function() {
+		delete chatClients[socket.id];
 		socket.get('username', function(err, username) {
 			if(!username) {
 				username = socket.id;
@@ -83,27 +89,28 @@ chat.on('connection', function (socket) {
 			}
 			*/
 			socket.broadcast.emit('serverMessage', 'User ' + username + ' disconnected');
+			
 		});
 	});
 
 	socket.on('join', function(room) {
 		//console.log("New room"+ room);
-		socket.get('room', function(err, oldRoom) {
+		/*socket.get('room', function(err, oldRoom) {
 			if(err) { throw err; }
 
 			socket.set('room', room, function (err) {
-				if(err) { throw err; }
+				if(err) { throw err; }*/
 
 				var newerroom = new Room({roomNum:roomCount, roomName: room, isPublic: 0, userCount: 0, users:[]}); //get room name from the user input later on
 				newerroom.data.users.push(socket.id);
 				console.log(newerroom.data);
 
-				socket.join(newerroom);
+				socket.join(room);
 				roomCount++;
 
-				if(oldRoom){
+				/*if(oldRoom){
 					socket.leave(oldRoom);
-				}
+				}*/
 				socket.get('username', function (err, username) {
 					if(!username){
 						username = socket.id;
@@ -118,9 +125,11 @@ chat.on('connection', function (socket) {
 					socket.broadcast.to(room).emit('serverMessage', 'User '+ username + ' joined this room ' + room);
 					socket.emit('serverInfo', 'Total Rooms : '+ newerroom.data.roomName);
 				});
-			});
 
-		});
+			
+			/*});
+
+		});*/
 	});
 
 	socket.emit('entry');
@@ -130,4 +139,6 @@ chat.on('connection', function (socket) {
 var prompt = repl.start({prompt: 'rooms> '});
 
 var rooms = require('./models/rooms');
-prompt.context.rooms = chat;
+prompt.context.io = io;
+prompt.context.room = rooms;
+prompt.context.clients = clients;

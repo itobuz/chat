@@ -1,16 +1,56 @@
 extends layout
 
 block content
-	h1= title
-	p Welcome to #{title}
+
+	div(class="container")
+		div(class="row")
+			div(class="col-lg-12")
+				h1 A better Bootstrap starter template.
+				p Complete with pre-defined file paths that you won't have to change!
+				input(type="button" class="btn btn-primary" id="createRoom" value="New Room")
+
+			div(class="col-md-9")	
+				ul(class="nav nav-tabs" id="rooms")
+					li(class="active")
+						a(href="#messages" data-toggle="tab") Lobby
+				
+				div(class="tab-content" id="roomContent")
+					div(class="tab-pane active well messageBox" id="messages")
+						input(type="text" class="form-control" id="input" placeholder="type here...")
+
+
+			div(class="col-md-3")	
+				div(class="well")				
+					h4 Rooms		
+						div(class="row")
+							div(class="col-lg-12")		
+								ul(class="list-unstyled" id="roomList")
+									li 
+										a(href="#") Dinosaurs
+	
+				div(class="well")				
+					h4 Rooms		
+						div(class="row")
+							div(class="col-lg-12")		
+								ul(class="list-unstyled" id="userList")
+									li 
+										a(href="#") Dinosaurs     
+
+
+				
+					
+
+					
+
+				
+
+
+
+
 
 	div(id="info")
 	
-	p Your message:
 
-	input(type="text" id="input")
-
-	div(id = "messages")
 
 
 	script(type='text/javascript', src= 'http://192.168.1.117:3000/socket.io/socket.io.js')
