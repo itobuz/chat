@@ -1,22 +1,23 @@
 
 
-			var messagesElement = document.getElementById('messages');
+			//var messagesElement = document.getElementById('roomContent');
 			var infoElement = document.getElementById('info');
 			var lastMessageElement = null;
 
-			function addMessage(message) {
+			function addMessage(message, room) {
 				var newMessageElement = document.createElement('div');
 				var newMessageText = document.createTextNode(message);
 
 				newMessageElement.appendChild(newMessageText);
-				messagesElement.insertBefore(newMessageElement, lastMessageElement);
-				lastMessageElement = newMessageElement;
+				//messagesElement.insertBefore(newMessageElement, lastMessageElement);
+				$('#roomContent div.active').appendChild(newMessageElement);
+				//lastMessageElement = newMessageElement;
 
 			}
 
-			var socket = io.connect('http://192.168.1.117:3000/chat');
-			socket.on('serverMessage', function(content) {
-				addMessage(content);
+			var socket = io.connect('http://localhost:3000/chat');
+			socket.on('serverMessage', function(content, room) {
+				addMessage(content, room);
 			});
 
 			socket.on('serverInfo', function(message) {
@@ -39,12 +40,12 @@
 				}
 			}
 
-			function sendMessage (message) {
+			function sendMessage (message, room) {
 				var commandMatch = message.match(/^\/(\w*)(.*)/);
 				if(commandMatch) {
 					sendCommand(commandMatch[1], commandMatch[2].trim());
 				} else {
-					socket.emit('clientMessage', message);
+					socket.emit('clientMessage', {message : message, room: room});
 				}
 			}
 
@@ -53,7 +54,10 @@
 			inputElement.onkeydown = function(keyboardEvent) {
 				if (keyboardEvent.keyCode === 13) {
 					//socket.emit('clientMessage', inputElement.value);
-					sendMessage(inputElement.value);
+					var r = $('#rooms li.active a').attr('href');
+					r = r.replace('#','');
+					
+					sendMessage(inputElement.value, r);
 					inputElement.value = '';
 					return false;
 				} else {
@@ -75,9 +79,17 @@
 			$('#createRoom').click(function (e) {
 					e.preventDefault();
 					var roomName = prompt('What room name would you like to use?');
-					var li = '<li><a href="#'+ roomName +'" data-toggle="tab">'+ roomName +'</a></li>';
-					$("#rooms").append(li);
-					li = '<div class="tab-pane well messageBox" id="'+ roomName +'">...</div>';
-					$("#roomContent").append(li);
+					if(roomName != null) {
+						socket.emit('join', roomName);
+						
+						$('#rooms li').removeClass('active');
+						$('#roomContent .tab-pane').removeClass('active');
+						var li = '<li class="active"><a href="#'+ roomName +'" data-toggle="tab">'+ roomName +'</a></li>';
+						$("#rooms").append(li);
+						li = '<div class="tab-pane well messageBox active" id="'+ roomName +'">...</div>';
+						$("#roomContent").append(li);
+						
+						
+					}
 			});
 		

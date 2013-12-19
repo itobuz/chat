@@ -20,7 +20,7 @@ var chat = io.of('/chat');
 
 chat.on('connection', function (socket) {
 	socket.on('clientMessage', function(content) {
-		socket.emit('serverMessage', 'You said : ' + content);
+		socket.emit('serverMessage', 'You said : ' + content.message);
 
 
 
@@ -29,14 +29,14 @@ chat.on('connection', function (socket) {
 				username = socket.id;
 			}
 
-			socket.get('room', function (err, room) {
-				if(err) { throw err; }
+			//socket.get('room', function (err, room) {
+				//if(err) { throw err; }
 				var broadcast = socket.broadcast;
-				var message = content;
-				if(room) {
-					broadcast = broadcast.to(room);
+				var message = content.message;
+				if(content.room) {
+					broadcast = broadcast.to(content.room);
 				}
-				broadcast.emit('serverMessage', username + ' said : ' + content);
+				broadcast.emit('serverMessage', username + ' said : ' + message);
 				
 				
 				var handshaken = io.sockets.handshaken;
@@ -45,7 +45,7 @@ chat.on('connection', function (socket) {
 				var closed = io.sockets.closed;
 
 				console.log(io.sockets.clients().length);
-			});
+			//});
 
 			
 		});
