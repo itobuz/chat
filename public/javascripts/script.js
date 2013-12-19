@@ -6,18 +6,18 @@
 
 			function addMessage(message, room) {
 				var newMessageElement = document.createElement('div');
-				var newMessageText = document.createTextNode(message);
+				var newMessageText = document.createTextNode('<div class="active"> {'+room+'} </div>'+message);
 
 				newMessageElement.appendChild(newMessageText);
 				//messagesElement.insertBefore(newMessageElement, lastMessageElement);
-				$('#roomContent div.active').appendChild(newMessageElement);
+				$('#roomContent #' + room + '').prepend(newMessageElement);
 				//lastMessageElement = newMessageElement;
 
 			}
 
 			var socket = io.connect('http://localhost:3000/chat');
-			socket.on('serverMessage', function(content, room) {
-				addMessage(content, room);
+			socket.on('serverMessage', function(content) {
+				addMessage(content.content, content.room);
 			});
 
 			socket.on('serverInfo', function(message) {

@@ -20,7 +20,7 @@ var chat = io.of('/chat');
 
 chat.on('connection', function (socket) {
 	socket.on('clientMessage', function(content) {
-		socket.emit('serverMessage', 'You said : ' + content.message);
+		socket.emit('serverMessage', {content:'You said : ' + content.message, room: content.room});
 
 
 
@@ -36,7 +36,7 @@ chat.on('connection', function (socket) {
 				if(content.room) {
 					broadcast = broadcast.to(content.room);
 				}
-				broadcast.emit('serverMessage', username + ' said : ' + message);
+				broadcast.emit('serverMessage',{content: username + ' said : ' + message, room: content.room});
 				
 				
 				var handshaken = io.sockets.handshaken;
@@ -69,8 +69,8 @@ chat.on('connection', function (socket) {
 
 			socket.broadcast.emit('serverInfo', 'Total Rooms : '+ room);
 
-			socket.emit('serverMessage', 'Currently loggedin as : ' + username);
-			socket.broadcast.emit('serverMessage', 'User ' + username + ' logged in');
+			socket.emit('serverMessage', {content: 'Currently loggedin as : ' + username, room: newroom.data.roomName});
+			socket.broadcast.emit('serverMessage', {content: 'User ' + username + ' logged in', room: newroom.data.roomName});
 		});
 	});
 
@@ -88,7 +88,7 @@ chat.on('connection', function (socket) {
 			    array.splice(index, 1);
 			}
 			*/
-			socket.broadcast.emit('serverMessage', 'User ' + username + ' disconnected');
+			socket.broadcast.emit('serverMessage',{content:  'User ' + username + ' disconnected', room: 'Lobby'});
 			
 		});
 	});
@@ -117,12 +117,12 @@ chat.on('connection', function (socket) {
 					}
 				});
 
-				socket.emit('serverMessage', 'You joined room: ' + room);
+				socket.emit('serverMessage', {content: 'You joined room: ' + room, room: room});
 				socket.get('username', function (err, username) {
 					if(!username){
 						username = socket.id;
 					}
-					socket.broadcast.to(room).emit('serverMessage', 'User '+ username + ' joined this room ' + room);
+					socket.broadcast.to(room).emit('serverMessage', {content: 'User '+ username + ' joined this room ' + room, room: room});
 					socket.emit('serverInfo', 'Total Rooms : '+ newerroom.data.roomName);
 				});
 
