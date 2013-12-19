@@ -55,9 +55,9 @@ chat.on('connection', function (socket) {
 		socket.set('username', username, function(err) {
 			if(err) { throw err; }
 
-			socket.join(newroom);
+			
 			room = newroom.data.roomName;
-
+			socket.join(room);
 			//socket.set('room', [newroom]);
 
 			//console.log("Get Rooms: " + socket.get('room'));
@@ -71,6 +71,9 @@ chat.on('connection', function (socket) {
 
 			socket.emit('serverMessage', {content: 'Currently loggedin as : ' + username, room: newroom.data.roomName});
 			socket.broadcast.emit('serverMessage', {content: 'User ' + username + ' logged in', room: newroom.data.roomName});
+
+			/* Load Rooms to new users */
+			socket.emit('loadRooms', chat.manager.rooms);
 		});
 	});
 
@@ -126,7 +129,9 @@ chat.on('connection', function (socket) {
 					socket.emit('serverInfo', 'Total Rooms : '+ newerroom.data.roomName);
 				});
 
+				/* Add new rooms to the Room list panel */
 				chat.emit('roomList', newerroom.data.roomName);
+
 			/*});
 
 		});*/

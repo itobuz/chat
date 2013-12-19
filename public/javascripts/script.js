@@ -70,6 +70,19 @@
 				$("#roomList").append(li);
 			});
 
+			socket.on('loadRooms', function(rooms) {
+				for(var r in rooms) {
+					var rname = rooms[r];
+					console.log("room :"+ r);
+					r = r.split('/');
+					if(r[2]) {
+						var li = '<li><a href="#'+ r[2] +'" >'+ r[2] +'</a></li>';
+						$("#roomList").append(li);
+					}
+				}
+				
+			});
+
 
 
 			$('#myTab a').click(function (e) {
