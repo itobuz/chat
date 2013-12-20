@@ -83,26 +83,52 @@
 				
 			});
 
+			jQuery( document ).ready(function( $ ) {
+
+				$(document).on("click", "#roomList li a", function (e) {
+					e.preventDefault()
+					var r = $(this).attr('href');
+					r = r.replace('#','');
+					console.log("click : "+ r);
+					//socket.emit('join', r);
+					checkAddRoom(r);
+				});
 
 
-			$('#myTab a').click(function (e) {
-				e.preventDefault()
-				$(this).tab('show')
+				$('#myTab a').click(function (e) {
+					e.preventDefault()
+					$(this).tab('show')
+				});
+				$('#createRoom').click(function (e) {
+						e.preventDefault();
+						var roomName = prompt('What room name would you like to use?');
+						if(roomName != null) {
+							
+							
+							checkAddRoom(roomName);
+							
+						}
+				});
+					  // Code using $ as usual goes here.
 			});
-			$('#createRoom').click(function (e) {
-					e.preventDefault();
-					var roomName = prompt('What room name would you like to use?');
-					if(roomName != null) {
-						socket.emit('join', roomName);
-						
-						$('#rooms li').removeClass('active');
-						$('#roomContent .tab-pane').removeClass('active');
-						var li = '<li class="active"><a href="#'+ roomName +'" data-toggle="tab">'+ roomName +'</a></li>';
-						$("#rooms").append(li);
-						li = '<div class="tab-pane well messageBox active" id="'+ roomName +'">...</div>';
-						$("#roomContent").append(li);
-						
-						
-					}
-			});
-		
+			function checkAddRoom(roomName) {
+				
+				socket.emit('join', roomName); // join only if a room name does not exists.
+
+				if($('#rooms li a[href$="#'+roomName+'"]').length){
+
+					$('#rooms li').removeClass('active');
+					$('#rooms li a[href$="#'+roomName+'"]').parent().addClass('active');
+
+				} else {
+					
+					$('#rooms li').removeClass('active');
+					$('#roomContent .tab-pane').removeClass('active');
+					var li = '<li class="active"><a href="#'+ roomName +'" data-toggle="tab">'+ roomName +'</a></li>';
+					$("#rooms").append(li);
+					li = '<div class="tab-pane well messageBox active" id="'+ roomName +'">...</div>';
+					$("#roomContent").append(li);
+
+				}
+
+			}
